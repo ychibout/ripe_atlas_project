@@ -148,7 +148,7 @@ asn = input(" >> ")
 if len(asn) == 0:   #No filter case
     listeprobe()
     subprocess.Popen("xterm -e 'node ~/Documents/Stage_2016/stream/servermongoose.js'", shell=True) #Run a new terminal executing the mongoose server
-    subprocess.call("firefox ~/Documents/Stage_2016/stream/socketapi.html", shell=True) #Run the html page which create the socket link with the Stream API
+    subprocess.call("chromium-browser ~/Documents/Stage_2016/stream/socketapi.html", shell=True) #Run the html page which create the socket link with the Stream API
     while(1):
         analyse()
         outmap()
@@ -156,7 +156,7 @@ if len(asn) == 0:   #No filter case
 else:   #ASN filter case
     listeprobeasn(asn)
     subprocess.Popen("xterm -e 'node ~/Documents/Stage_2016/stream/servermongoose.js'", shell=True)
-    subprocess.call("firefox ~/Documents/Stage_2016/stream/socketapi.html", shell=True)
+    subprocess.call("chromium-browser ~/Documents/Stage_2016/stream/socketapi.html", shell=True)
     while (1):
         analyse()
         recupresultasn(asn)
