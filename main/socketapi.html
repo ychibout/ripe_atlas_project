@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+        <head>
+                <meta charset="utf-8"/>
+                <title>Test Socket.io</title>
+        </head>
+
+        <body>
+                <script src="https://atlas-stream.ripe.net/socket.io.js"></script>
+
+                <script>
+
+                        var socket = io("https://atlas-stream.ripe.net:443", { path : "/stream/socket.io" });   <!-- Creating the socket connection -->
+
+                        socket.emit("atlas_subscribe", { stream_type: "probestatus" }); <!-- Subscribing to the probestatus stream -->
+
+                        socket.on("atlas_probestatus", function(result){        <!-- When data are received -->
+                                console.log(result);
+                                location.href = "http://localhost:10001" + "?id=" + result["prb_id"] + "&status=" + result["event"] + "&timestamp=" + result["timestamp"] + "&controller=" + result["controller"] + "&asn=" + result["asn"];
+                                <!-- Sending the data to the port 10001, were the node.js server is listening -->
+                        });
+
+                </script>
+        </body>
+</html>
