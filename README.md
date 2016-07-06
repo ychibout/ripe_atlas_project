@@ -1,7 +1,7 @@
 RIPE ATLAS Project
 ===================
 
-Python 3 probe map creator and controller/country breakdown checker using the RIPE ATLAS REST API.
+Python 3 probe map creator and controller/country breakdown checker using the RIPE ATLAS REST API and the RIPE ATLAS Stream API.
 
 
 Requirements
@@ -22,7 +22,7 @@ A node.js server is used to listen the stream of the RIPE ATLAS API.
 $ apt-get install nodejs
 ```
 
-Finally, a MongoDB database, connected with the node.js server, will storage data sent from the stream API. We use the node.js API of MongoDB, named Mongoose.
+Finally, a MongoDB database, connected with the node.js server, will storage data sent from the stream API. We use the node.js API of MongoDB, named Mongoose, and the Python API, named PyMongo. 
 
 Install of MongoDB:
 
@@ -34,6 +34,12 @@ Install of Mongoose:
 
 ```
 $ npm install mongoose
+```
+
+Install of pymongo:
+
+```
+$ pip3 install pymongo
 ```
 
 
@@ -84,5 +90,5 @@ Finally, the programm will create a map in the folder ./main (output.html) and p
 Additional details
 ----------
 
-To learn more about this programm, please consider comments in source code.
+To learn more about this program, please consider comments in source code.
 

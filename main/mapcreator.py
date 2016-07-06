@@ -4,6 +4,7 @@ from collections import namedtuple
 from ripe.atlas.cousteau import AtlasRequest
 from pymongo import MongoClient
 import time
+import sys
 import datetime
 
 client = MongoClient('mongodb://localhost')
@@ -51,7 +52,7 @@ class Map(object):
 
 def recupresultasn(asn) :   #Function called only if an ASN is given as filter
     map = Map()
-    db = client.bdd1
+    db = client.bdd
     collection = db.probes
 
     for elem in collection.find():
@@ -66,7 +67,7 @@ def recupresultasn(asn) :   #Function called only if an ASN is given as filter
 
 
 def listeprobe() :  #Store all probes of the RIPE ATLAS Network with their actual status
-    db = client.bdd1
+    db = client.bdd
     collection = db.probes
     i = 0
     while i <= 18500:
@@ -91,7 +92,7 @@ def listeprobe() :  #Store all probes of the RIPE ATLAS Network with their actua
         i+=500
 
 def listeprobeasn(asn): #Store probes attached to the AS with the given ASN
-    db = client.bdd1
+    db = client.bdd
     collection = db.probes
     request = AtlasRequest(**{"url_path": "/api/v1/probe/?limit=500&asn=" + asn})
     result = namedtuple('Result', 'success response')
@@ -113,7 +114,7 @@ def listeprobeasn(asn): #Store probes attached to the AS with the given ASN
 
 def outmap() :  #creation of the map using the Google Maps API
     map = Map()
-    db = client.bdd1
+    db = client.bdd
     collection = db.probes
 
     for elem in collection.find():
@@ -126,7 +127,7 @@ def outmap() :  #creation of the map using the Google Maps API
         print(map, file=out)
 
 def analyse():  #Check country/controller breakdown
-        db = client.bdd1
+        db = client.bdd
         collection = db.probes
         print(datetime.datetime.fromtimestamp(time.time()))
         print("Last status changing timestamp :  " + datetime.datetime.fromtimestamp(db.probes.find_one({"$query":{},"$orderby":{"timestamp":-1}})["timestamp"]).strftime('%c') + "\n")
@@ -140,24 +141,75 @@ def analyse():  #Check country/controller breakdown
                 print("\tcontroller " + res + " down : " + str(collection.count({"controller" : res, "status" : "disconnect"})) + " probes of " + str(collection.count({"controller" : res})) + " disconnected")
         print("\n")
 
+if len(sys.argv) != 1 and sys.argv[1] == "--help":
+    print("\nUsage : python3 mapcreator.py [-t] [TERMINAL_NAME] [-b] [BROWSER_NAME]\n\n\t-t : define terminal used by the program\n\t-b : Define browser used by the program")
+else:
+    print("Please choose an ASN as filter : ")
+    asn = input(" >> ")
+
+    varpwd = subprocess.check_output("pwd")
+    newpwd = str(varpwd).replace("b'","")
+    newpwd2 = str(newpwd).replace("n'","")
+    newpwd3 = str(newpwd2).replace("\\","")
 
 
-print("Please choose an ASN as filter : ")
-asn = input(" >> ")
+    if len(asn) == 0:   #No filter case
+        print("\n\t\tPlease wait during the storage of all probes data...\n")
+        listeprobe()
 
-if len(asn) == 0:   #No filter case
-    listeprobe()
-    subprocess.Popen("xterm -e 'node ~/Documents/Stage_2016/stream/servermongoose.js'", shell=True) #Run a new terminal executing the mongoose server
-    subprocess.call("chromium-browser ~/Documents/Stage_2016/stream/socketapi.html", shell=True) #Run the html page which create the socket link with the Stream API
-    while(1):
-        analyse()
-        outmap()
-        time.sleep(20)
-else:   #ASN filter case
-    listeprobeasn(asn)
-    subprocess.Popen("xterm -e 'node ~/Documents/Stage_2016/stream/servermongoose.js'", shell=True)
-    subprocess.call("chromium-browser ~/Documents/Stage_2016/stream/socketapi.html", shell=True)
-    while (1):
-        analyse()
-        recupresultasn(asn)
-        time.sleep(20)
+        if len(sys.argv) == 3:
+            if str(sys.argv[1]) == "-t":
+                subprocess.Popen(str(sys.argv[2]) + " -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
+                subprocess.Popen("chromium-browser --new-window " + newpwd3 + "/socketapi.html", shell=True)
+            elif str(sys.argv[1]) == "-b":
+                subprocess.Popen("x-terminal-emulator -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
+                subprocess.Popen(str(sys.argv[2]) + " " + newpwd3 + "/socketapi.html", shell=True)
+            else:
+                print("Error during passing of arguments")
+        elif len(sys.argv) == 5:
+            if str(sys.argv[1]) == "-t":
+                subprocess.Popen(str(sys.argv[2]) + " -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
+                subprocess.Popen(str(sys.argv[4]) + " " + newpwd3 + "/socketapi.html", shell=True)
+            elif str(sys.argv[1]) == "-b":
+                subprocess.Popen(str(sys.argv[4]) + " -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
+                subprocess.Popen(str(sys.argv[2]) + " " + newpwd3 + "/socketapi.html", shell=True)
+            else:
+                print("Error during passing of arguments")
+        else:
+            subprocess.Popen("x-terminal-emulator -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
+            subprocess.Popen("chromium-browser --new-window " + newpwd3 + "/socketapi.html", shell=True)
+
+        while(1):
+            analyse()
+            outmap()
+            time.sleep(20)
+
+    else:   #ASN filter case
+        listeprobeasn(asn)
+
+        if len(sys.argv) == 3:
+            if str(sys.argv[1]) == "-t":
+                subprocess.Popen(str(sys.argv[2]) + " -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
+                subprocess.Popen("chromium-browser --new-window " + newpwd3 + "/socketapi.html", shell=True)
+            elif str(sys.argv[1]) == "-b":
+                subprocess.Popen("x-terminal-emulator -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
+                subprocess.Popen(str(sys.argv[2]) + " " + newpwd3 + "/socketapi.html", shell=True)
+            else:
+                print("Error during passing of arguments")
+        elif len(sys.argv) == 5:
+            if str(sys.argv[1]) == "-t":
+                subprocess.Popen(str(sys.argv[2]) + " -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
+                subprocess.Popen(str(sys.argv[4]) + " " + newpwd3 + "/socketapi.html", shell=True)
+            elif str(sys.argv[1]) == "-b":
+                subprocess.Popen(str(sys.argv[4]) + " -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
+                subprocess.Popen(str(sys.argv[2]) + " " + newpwd3 + "/socketapi.html", shell=True)
+            else:
+                print("Error during passing of arguments")
+        else:
+            subprocess.Popen("x-terminal-emulator -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
+            subprocess.Popen("chromium-browser --new-window " + newpwd3 + "/socketapi.html", shell=True)
+
+        while(1):
+            analyse()
+            recupresultasn(asn)
+            time.sleep(20)
