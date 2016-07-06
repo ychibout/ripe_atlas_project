@@ -59,6 +59,21 @@ When you are in the Repository you've clone, just type this command :
 $ python3 main/mapcreator.py
 ```
 
+The program uses basically Chromium browser. You can change the browser to use by typing :
+
+```
+$ python3 main/mapcreator.py -b <browser_command>
+```
+
+You can also change the terminal used by program with :
+
+```
+$ python3 main/mapcreator.py -t <terminal_command>
+```
+
+The usage is also explained by passing the option --help. 
+
+
 Then, you will able to choose which ASN use as filter of the map marker displayer. If nothing is typed, the programm will display on the output map all probes of the RIPE Atlas Network.
 
 
