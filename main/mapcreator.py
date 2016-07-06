@@ -153,7 +153,7 @@ else:
     newpwd3 = str(newpwd2).replace("\\","")
 
 
-    if len(asn) == 0:   #No filter case
+    if len(str(asn)) == 0:   #No filter case
         print("\n\t\tPlease wait during the storage of all probes data...\n")
         listeprobe()
 
