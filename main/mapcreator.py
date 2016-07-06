@@ -94,7 +94,7 @@ def listeprobe() :  #Store all probes of the RIPE ATLAS Network with their actua
 def listeprobeasn(asn): #Store probes attached to the AS with the given ASN
     db = client.bdd
     collection = db.probes
-    request = AtlasRequest(**{"url_path": "/api/v1/probe/?limit=500&asn=" + asn})
+    request = AtlasRequest(**{"url_path": "/api/v1/probe/?limit=500&asn=" + str(asn)})
     result = namedtuple('Result', 'success response')
     (is_success, response) = request.get()
 
