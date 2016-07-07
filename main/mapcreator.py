@@ -97,7 +97,7 @@ def listeprobe() :  #Store all probes of the RIPE ATLAS Network with their actua
 
             count+=1
 
-            print(str((count/18630)*100) + " %")
+            print(str((count/response["meta"]["total_count"])*100) + " %")
 
         i+=500
 
