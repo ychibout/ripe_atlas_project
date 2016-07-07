@@ -27,7 +27,7 @@ Finally, a MongoDB database, connected with the node.js server, will storage dat
 Install of MongoDB:
 
 ```
-$ apt-get install mongodb-org
+$ apt-get install mongodb
 ```
 
 Install of Mongoose:

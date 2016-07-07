@@ -70,12 +70,18 @@ def listeprobe() :  #Store all probes of the RIPE ATLAS Network with their actua
     db = client.bdd
     collection = db.probes
     i = 0
+    count=0
     while i <= 18500:
         request = AtlasRequest(**{"url_path": "/api/v1/probe/?limit=500&offset=" + str(i)})
         result = namedtuple('Result', 'success response')
         (is_success, response) = request.get()
 
         for id in response["objects"]:
+            #Searching for controller name using last status changing timestamp
+            request = AtlasRequest(**{"url_path": "/api/v1/measurement/7000/result/?start=" + str(id["status_since"]) + "&stop=" + str(id["status_since"]) + "&prb_id=" + str(id["id"])})
+            result = namedtuple('Result2', 'success response2')
+            (is_success2, response2) = request.get()
+
             collection.insert_one(
                 {
                     "id" : id["id"],
@@ -83,11 +89,15 @@ def listeprobe() :  #Store all probes of the RIPE ATLAS Network with their actua
                     "timestamp" : id["last_connected"],
                     "latitude" : id["latitude"],
                     "longitude" : id["longitude"],
-                    "controller" : "null",
+                    "controller" : "" if len(response2) == 0 else response2[0]["controller"],
                     "asn" : id["asn_v4"],
                     "country_code" : id["country_code"]
                 }
             )
+
+            count+=1
+
+            print(str((count/18630)*100) + " %")
 
         i+=500
 
@@ -97,8 +107,13 @@ def listeprobeasn(asn): #Store probes attached to the AS with the given ASN
     request = AtlasRequest(**{"url_path": "/api/v1/probe/?limit=500&asn=" + str(asn)})
     result = namedtuple('Result', 'success response')
     (is_success, response) = request.get()
-
+    count=0
     for id in response["objects"]:
+
+        request = AtlasRequest(**{"url_path": "/api/v1/measurement/7000/result/?start=" + str(id["status_since"]) + "&stop=" + str(id["status_since"]) + "&prb_id=" + str(id["id"])})
+        result = namedtuple('Result2', 'success response2')
+        (is_success2, response2) = request.get()
+
         collection.insert_one(
             {
                 "id" : id["id"],
@@ -106,11 +121,15 @@ def listeprobeasn(asn): #Store probes attached to the AS with the given ASN
                 "timestamp" : id["last_connected"],
                 "latitude" : id["latitude"],
                 "longitude" : id["longitude"],
-                "controller" : "null",
+                "controller" : "" if len(response2) == 0 else response2[0]["controller"],
                 "asn" : id["asn_v4"],
                 "country_code" : id["country_code"]
             }
         )
+
+        count+=1
+
+        print(str((count/response["meta"]["total_count"])*100) + " %")
 
 def outmap() :  #creation of the map using the Google Maps API
     map = Map()
@@ -185,6 +204,7 @@ else:
             time.sleep(20)
 
     else:   #ASN filter case
+        print("\n\t\tPlease wait during the storage of all probes data...\n")
         listeprobeasn(asn)
 
         if len(sys.argv) == 3:
