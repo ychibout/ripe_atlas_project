@@ -77,11 +77,13 @@ You can also change the terminal used by program with :
 $ python3 main/mapcreator.py -t <terminal_command>
 ```
 
-Finaly, you can define a filter by ASN to display on the map only probe with the given ASN :
+You can define a filter by ASN to display on the map only probe with the given ASN :
 
 ```
 $ python3 main/mapcreator.py --asn <as_number>
 ```
+
+Or a filter by country code with --country option, or by controller with --controller option.
 
 The usage is also explained by passing the option --help. 
 
