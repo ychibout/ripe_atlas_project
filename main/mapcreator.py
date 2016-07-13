@@ -108,26 +108,27 @@ def listeprobeasn(asn): #Store probes attached to the AS with the given ASN
     result = namedtuple('Result', 'success response')
     (is_success, response) = request.get()
     count=0
+
     for id in response["objects"]:
+        if id["status"] == 1 or id["status"] == 2:
+            request = AtlasRequest(**{"url_path": "/api/v1/measurement/7000/result/?start=" + str(id["status_since"]) + "&stop=" + str(id["status_since"]) + "&prb_id=" + str(id["id"])})
+            result = namedtuple('Result2', 'success response2')
+            (is_success2, response2) = request.get()
 
-        request = AtlasRequest(**{"url_path": "/api/v1/measurement/7000/result/?start=" + str(id["status_since"]) + "&stop=" + str(id["status_since"]) + "&prb_id=" + str(id["id"])})
-        result = namedtuple('Result2', 'success response2')
-        (is_success2, response2) = request.get()
+            collection.insert_one(
+                {
+                    "id" : id["id"],
+                    "status" : id["status"],
+                    "timestamp" : id["last_connected"],
+                    "latitude" : id["latitude"],
+                    "longitude" : id["longitude"],
+                    "controller" : "" if len(response2) == 0 else response2[0]["controller"],
+                    "asn" : id["asn_v4"],
+                    "country_code" : id["country_code"]
+                }
+            )
 
-        collection.insert_one(
-            {
-                "id" : id["id"],
-                "status" : id["status"],
-                "timestamp" : id["last_connected"],
-                "latitude" : id["latitude"],
-                "longitude" : id["longitude"],
-                "controller" : "" if len(response2) == 0 else response2[0]["controller"],
-                "asn" : id["asn_v4"],
-                "country_code" : id["country_code"]
-            }
-        )
-
-        count+=1
+            count+=1
 
         print(str((count/response["meta"]["total_count"])*100) + " %")
 
