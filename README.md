@@ -88,7 +88,7 @@ Or a filter by country code with --country option, or by controller with --contr
 The usage is also explained by passing the option --help. 
 
 
-Then, you will able to choose which ASN use as filter of the map marker displayer. If nothing is typed, the programm will display on the output map all probes of the RIPE Atlas Network.
+Then, you will able to choose for example which ASN use as filter of the map marker displayer. If nothing is typed, the programm will display on the output map all probes of the RIPE Atlas Network.
 
 
 Results
@@ -113,7 +113,7 @@ Every 20 seconds (customizable), the python programm browse the database to chec
 $ python3 main/mapcreator.py > out
 ```
 
-Finally, the programm will create a map in the folder ./main (output.html) and places all markers related to probes in the database. This display could be filter by ASN. The freshing rate is 20 seconds (customizable).
+Finally, the programm will create a map in the folder ./main (output.html) and places all markers related to probes in the database. This display could be filter by ASN, controller or country code. The freshing rate is 20 seconds (customizable).
 
 
 Additional details
