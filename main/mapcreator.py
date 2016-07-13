@@ -52,7 +52,7 @@ class Map(object):
 
 def recupresultasn(asn) :   #Function called only if an ASN is given as filter
     map = Map()
-    db = client.bdd
+    db = client.bdd1
     collection = db.probes
 
     for elem in collection.find():
@@ -67,7 +67,7 @@ def recupresultasn(asn) :   #Function called only if an ASN is given as filter
 
 
 def listeprobe() :  #Store all probes of the RIPE ATLAS Network with their actual status
-    db = client.bdd
+    db = client.bdd1
     collection = db.probes
     i = 0
     count=0
@@ -78,31 +78,31 @@ def listeprobe() :  #Store all probes of the RIPE ATLAS Network with their actua
 
         for id in response["objects"]:
             if id["status"] == 1 or id["status"] == 2:
-            request = AtlasRequest(**{"url_path": "/api/v1/measurement/7000/result/?start=" + str(id["status_since"]) + "&stop=" + str(id["status_since"]) + "&prb_id=" + str(id["id"])})
-            result = namedtuple('Result2', 'success response2')
-            (is_success2, response2) = request.get()
+                request = AtlasRequest(**{"url_path": "/api/v1/measurement/7000/result/?start=" + str(id["status_since"]) + "&stop=" + str(id["status_since"]) + "&prb_id=" + str(id["id"])})
+                result = namedtuple('Result2', 'success response2')
+                (is_success2, response2) = request.get()
 
-            collection.insert_one(
-                {
-                    "id" : id["id"],
-                    "status" : id["status"],
-                    "timestamp" : id["last_connected"],
-                    "latitude" : id["latitude"],
-                    "longitude" : id["longitude"],
-                    "controller" : "" if len(response2) == 0 else response2[0]["controller"],
-                    "asn" : id["asn_v4"],
-                    "country_code" : id["country_code"]
-                }
-            )
+                collection.insert_one(
+                    {
+                        "id" : id["id"],
+                        "status" : id["status"],
+                        "timestamp" : id["last_connected"],
+                        "latitude" : id["latitude"],
+                        "longitude" : id["longitude"],
+                        "controller" : "" if len(response2) == 0 else response2[0]["controller"],
+                        "asn" : id["asn_v4"],
+                        "country_code" : id["country_code"]
+                    }
+                )
 
-            count+=1
+                count+=1
 
-            print(str((count/response["meta"]["total_count"])*100) + " %")
+                print(str((count/response["meta"]["total_count"])*100) + " %")
 
         i+=500
 
 def listeprobeasn(asn): #Store probes attached to the AS with the given ASN
-    db = client.bdd
+    db = client.bdd1
     collection = db.probes
     request = AtlasRequest(**{"url_path": "/api/v1/probe/?limit=500&asn=" + str(asn)})
     result = namedtuple('Result', 'success response')
@@ -134,7 +134,7 @@ def listeprobeasn(asn): #Store probes attached to the AS with the given ASN
 
 def outmap() :  #creation of the map using the Google Maps API
     map = Map()
-    db = client.bdd
+    db = client.bdd1
     collection = db.probes
 
     for elem in collection.find():
@@ -147,7 +147,7 @@ def outmap() :  #creation of the map using the Google Maps API
         print(map, file=out)
 
 def analyse():  #Check country/controller breakdown
-        db = client.bdd
+        db = client.bdd1
         collection = db.probes
         print(datetime.datetime.fromtimestamp(time.time()))
         print("Last status changing timestamp :  " + datetime.datetime.fromtimestamp(db.probes.find_one({"$query":{},"$orderby":{"timestamp":-1}})["timestamp"]).strftime('%c') + "\n")
@@ -162,10 +162,9 @@ def analyse():  #Check country/controller breakdown
         print("\n")
 
 if len(sys.argv) != 1 and sys.argv[1] == "--help":
-    print("\nUsage : python3 mapcreator.py [-t] [TERMINAL_NAME] [-b] [BROWSER_NAME]\n\n\t-t : define terminal used by the program\n\t-b : Define browser used by the program")
-else:
-    print("Please choose an ASN as filter : ")
-    asn = input(" >> ")
+    print("\nUsage : python3 mapcreator.py [--asn] [AS_NUMBER] [-t] [TERMINAL_NAME] [-b] [BROWSER_NAME]\n\n\t-t : define terminal used by the program\n\t-b : Define browser used by the program\n\t--asn : Filter probes by ASN")
+elif sys.argv[1] == "--asn":
+    asn = sys.argv[2]
 
     varpwd = subprocess.check_output("pwd")
     newpwd = str(varpwd).replace("b'","")
@@ -173,6 +172,37 @@ else:
     newpwd3 = str(newpwd2).replace("\\","")
 
 
+    print("\n\t\tPlease wait during the storage of all probes data...\n")
+    listeprobeasn(asn)
+
+    if len(sys.argv) == 5:
+        if str(sys.argv[3]) == "-t":
+            subprocess.Popen(str(sys.argv[4]) + " -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
+            subprocess.Popen("chromium-browser --new-window " + newpwd3 + "/socketapi.html", shell=True)
+        elif str(sys.argv[3]) == "-b":
+            subprocess.Popen("x-terminal-emulator -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
+            subprocess.Popen(str(sys.argv[4]) + " " + newpwd3 + "/socketapi.html", shell=True)
+        else:
+            print("Error during passing of arguments")
+    elif len(sys.argv) == 7:
+        if str(sys.argv[3]) == "-t":
+            subprocess.Popen(str(sys.argv[4]) + " -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
+            subprocess.Popen(str(sys.argv[6]) + " " + newpwd3 + "/socketapi.html", shell=True)
+        elif str(sys.argv[1]) == "-b":
+            subprocess.Popen(str(sys.argv[6]) + " -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
+            subprocess.Popen(str(sys.argv[4]) + " " + newpwd3 + "/socketapi.html", shell=True)
+        else:
+            print("Error during passing of arguments")
+    else:
+        subprocess.Popen("x-terminal-emulator -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
+        subprocess.Popen("chromium-browser --new-window " + newpwd3 + "/socketapi.html", shell=True)
+
+    while(1):
+        analyse()
+        recupresultasn(asn)
+        time.sleep(20)
+
+else:
     if len(str(asn)) == 0:   #No filter case
         print("\n\t\tPlease wait during the storage of all probes data...\n")
         listeprobe()
@@ -202,35 +232,4 @@ else:
         while(1):
             analyse()
             outmap()
-            time.sleep(20)
-
-    else:   #ASN filter case
-        print("\n\t\tPlease wait during the storage of all probes data...\n")
-        listeprobeasn(asn)
-
-        if len(sys.argv) == 3:
-            if str(sys.argv[1]) == "-t":
-                subprocess.Popen(str(sys.argv[2]) + " -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
-                subprocess.Popen("chromium-browser --new-window " + newpwd3 + "/socketapi.html", shell=True)
-            elif str(sys.argv[1]) == "-b":
-                subprocess.Popen("x-terminal-emulator -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
-                subprocess.Popen(str(sys.argv[2]) + " " + newpwd3 + "/socketapi.html", shell=True)
-            else:
-                print("Error during passing of arguments")
-        elif len(sys.argv) == 5:
-            if str(sys.argv[1]) == "-t":
-                subprocess.Popen(str(sys.argv[2]) + " -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
-                subprocess.Popen(str(sys.argv[4]) + " " + newpwd3 + "/socketapi.html", shell=True)
-            elif str(sys.argv[1]) == "-b":
-                subprocess.Popen(str(sys.argv[4]) + " -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
-                subprocess.Popen(str(sys.argv[2]) + " " + newpwd3 + "/socketapi.html", shell=True)
-            else:
-                print("Error during passing of arguments")
-        else:
-            subprocess.Popen("x-terminal-emulator -e 'node " + newpwd3 + "/mongooseserver.js'", shell=True)
-            subprocess.Popen("chromium-browser --new-window " + newpwd3 + "/socketapi.html", shell=True)
-
-        while(1):
-            analyse()
-            recupresultasn(asn)
             time.sleep(20)

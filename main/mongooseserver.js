@@ -4,7 +4,7 @@ var http = require('http');
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 
-mongoose.connect('mongodb://localhost/bdd', function(err) {     //connection to the MongoDB database with Mongoose client
+mongoose.connect('mongodb://localhost/bdd1', function(err) {     //connection to the MongoDB database with Mongoose client
         if (err) {throw err;}
 });
 

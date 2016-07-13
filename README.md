@@ -77,6 +77,12 @@ You can also change the terminal used by program with :
 $ python3 main/mapcreator.py -t <terminal_command>
 ```
 
+Finaly, you can define a filter by ASN to display on the map only probe with the given ASN :
+
+```
+$ python3 main/mapcreator.py --asn <as_number>
+```
+
 The usage is also explained by passing the option --help. 
 
 
@@ -94,8 +100,8 @@ At the same time, these informations are stored in a MongoDB Database. To check 
 $ mongo
 MongoDB shell version: 2.4.9
 connecting to: test
-> use bdd
-switched to db bdd
+> use bdd1
+switched to db bdd1
 > db.probes.find()
 ```
 
