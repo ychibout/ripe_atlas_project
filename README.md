@@ -37,13 +37,19 @@ $ npm install mongoose
 ```
 
 Install of pymongo:
+With pip3 :
 
 ```
 $ pip3 install pymongo
 ```
 
+With apt-get:
 
-Of course, to use the programm, you have to clone this Github Repository 
+```
+$ apt-get install python3-pymongo
+```
+
+Of course, to use the program, you have to clone this Github Repository or just download the ZIP file : 
 
 ```
 $ git clone https://github.com/ychibout/ripe_atlas_project.git
