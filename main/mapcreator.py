@@ -77,7 +77,7 @@ def listeprobe() :  #Store all probes of the RIPE ATLAS Network with their actua
         (is_success, response) = request.get()
 
         for id in response["objects"]:
-            #Searching for controller name using last status changing timestamp
+            if id["status"] == 1 or id["status"] == 2:
             request = AtlasRequest(**{"url_path": "/api/v1/measurement/7000/result/?start=" + str(id["status_since"]) + "&stop=" + str(id["status_since"]) + "&prb_id=" + str(id["id"])})
             result = namedtuple('Result2', 'success response2')
             (is_success2, response2) = request.get()
