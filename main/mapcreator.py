@@ -20,35 +20,128 @@ class Map(object):
             self.inactive.append(coordinates)
     def __str__(self):
         markersCode1 = "\n".join(   #A map marker of active probe
-            [ """new google.maps.Marker({{
+            [ """var info{name} = new google.maps.InfoWindow({{
+                    content:'<p><b>ID</b> : {id} </br> <b>ASN</b> : {asn} </br> <b>Country Code</b> : {country_code}<br\></p>'
+                }});
+
+            var marker{name} = new google.maps.Marker({{
                 position: new google.maps.LatLng({lat}, {lon}),
                 icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-                map: map
-                }});""".format(lat=x[0], lon=x[1]) for x in self.active
+                map: map,
+                title: {id}
+            }});
+
+            marker{name}.addListener('click', function() {{
+                info{name}.open(map, marker{name});
+            }});""".format(lat=x[0], lon=x[1], name=self.active.index(x), id=x[2], asn=x[3], country_code=x[4]) for x in self.active
             ])
         markersCode2 = "\n".join(   #A map marker of inactive probe
-            [ """new google.maps.Marker({{
+            [ """var info{name} = new google.maps.InfoWindow({{
+                    content:'<p><b>ID</b> : {id} </br> <b>ASN</b> : {asn} </br> <b>Country Code</b> : {country_code}<br\></p>'
+                }});
+
+            var marker{name} = new google.maps.Marker({{
                 position: new google.maps.LatLng({lat}, {lon}),
                 icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-                map: map
-                }});""".format(lat=x[0], lon=x[1]) for x in self.inactive
+                map: map,
+                title: {id}
+            }});
+
+            marker{name}.addListener('click', function() {{
+                info{name}.open(map, marker{name});
+            }});""".format(lat=x[0], lon=x[1], name=self.inactive.index(x) + len(self.active), id=x[2], asn=x[3], country_code=x[4]) for x in self.inactive
             ])
+        panel1 = "\n".join(["""<p>ID : {id} | ASN : {asn} | Country Code : {country_code}<br\></p>""".format(id=x[2], asn=x[3], country_code=x[4]) for x in self.active])
+        panel2 = "\n".join(["""<p>ID : {id} | ASN : {asn} | Country Code : {country_code}<br\></p>""".format(id=x[2], asn=x[3], country_code=x[4]) for x in self.inactive])
         return """
-            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDN7jkdXxXCQrDfsuel6kciz8p9F6LzqBc"></script> <!-- please feed with your API Google Maps key -->
-            <div id="map-canvas" style="height: 100%; width: 100%"></div>
-            <script type="text/javascript">
-                var map;
-                function show_map() {{  <!-- Creating Map -->
-                    map = new google.maps.Map(document.getElementById("map-canvas"), {{
-                        zoom: 3,
-                        center: new google.maps.LatLng(48.8589713, 2.0673746)
-                    }});
-                    {markersCode1}
-                    {markersCode2}
-                }}
-                google.maps.event.addDomListener(window, 'load', show_map);
-            </script>
-        """.format(markersCode1=markersCode1, markersCode2=markersCode2)
+                <style>
+                    button.accordion {{
+                        background-color: #eee;
+                        color: #444;
+                        cursor: pointer;
+                        padding: 18px;
+                        width: 50%;
+                        border: none;
+                        text-align: left;
+                        outline: none;
+                        float: right;
+                        font-size: 15px;
+                        transition: 0.4s;
+                    }}
+
+                    button.accordion.active, button.accordion:hover {{
+                        background-color: #ddd;
+                    }}
+
+                    button.accordion:after {{
+                        content: '+';
+                        font-size: 13px;
+                        color: #777;
+                        float: right;
+                        margin-left: 5px;
+                    }}
+
+                    button.accordion.active:after {{
+                        content: "-";
+                        float: right;
+                    }}
+
+                    div.panel {{
+                        padding: 0 18px;
+                        background-color: white;
+                        max-height: 0;
+                        overflow: hidden;
+                        float: right;
+                        transition: 0.6s ease-in-out;
+                        opacity: 0;
+                        padding-left:51%;
+                    }}
+
+                    div.panel.show {{
+                        opacity: 1;
+                        max-height: 100000px;
+                        font-family : "arial";
+                    }}
+                </style>
+
+                <button class="accordion">Connected Probes : {coprobes}</button>
+                <div class="panel">
+                    {panel1}
+                </div>
+
+                <button class="accordion">Disconnected Probes : {discoprobes}</button>
+                <div class="panel">
+                    {panel2}
+                </div>
+
+                <script>
+                    var acc = document.getElementsByClassName("accordion");
+                    var i;
+
+                    for (i = 0; i < acc.length; i++) {{
+                        acc[i].onclick = function(){{
+                            this.classList.toggle("active");
+                            this.nextElementSibling.classList.toggle("show");
+                      }}
+                    }}
+                </script>
+
+                <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDN7jkdXxXCQrDfsuel6kciz8p9F6LzqBc"></script>
+                <div id="map-canvas" style="height: 100%; width: 50%; float:left; position: absolute"></div>
+                <script type="text/javascript">
+                    var map;
+                    function show_map() {{  <!-- Creating Map -->
+                        map = new google.maps.Map(document.getElementById("map-canvas"), {{
+                            zoom: 3,
+                            center: new google.maps.LatLng(48.8589713, 2.0673746)
+                        }});
+                        {markersCode1}
+                        {markersCode2}
+                    }}
+                    google.maps.event.addDomListener(window, 'load', show_map);
+                </script>
+
+        """.format(markersCode1=markersCode1, markersCode2=markersCode2, coprobes=len(self.active), discoprobes=len(self.inactive), panel1=panel1, panel2=panel2)
 
 def recupresultasn(asn) :   #Function called only if an ASN is given as filter
     map = Map()
@@ -58,9 +151,9 @@ def recupresultasn(asn) :   #Function called only if an ASN is given as filter
     for elem in collection.find():
         if str(elem["asn"]) == asn:
             if elem["status"] == 1 or elem["status"] == "connect":
-                map.add_point((elem["latitude"], elem["longitude"]), 1)
+                map.add_point((elem["latitude"], elem["longitude"], elem["id"], elem["asn"], elem["country_code"]), 1)
             if elem["status"] == 2 or elem["status"] == "disconnect":
-                map.add_point((elem["latitude"], elem["longitude"]), 2)
+                map.add_point((elem["latitude"], elem["longitude"], elem["id"], elem["asn"], elem["country_code"]), 2)
 
     with open("output.html", "w") as out:
         print(map, file=out)
@@ -75,9 +168,9 @@ def recupresultcountry(country) :   #Function called only if an ASN is given as 
     for elem in collection.find():
         if str(elem["country_code"]) == country:
             if elem["status"] == 1 or elem["status"] == "connect":
-                map.add_point((elem["latitude"], elem["longitude"]), 1)
+                map.add_point((elem["latitude"], elem["longitude"], elem["id"], elem["asn"], elem["country_code"]), 1)
             if elem["status"] == 2 or elem["status"] == "disconnect":
-                map.add_point((elem["latitude"], elem["longitude"]), 2)
+                map.add_point((elem["latitude"], elem["longitude"], elem["id"], elem["asn"], elem["country_code"]), 2)
 
     with open("output.html", "w") as out:
         print(map, file=out)
@@ -91,9 +184,9 @@ def recupresultcontroller(controller) :   #Function called only if an ASN is giv
     for elem in collection.find():
         if str(elem["controller"]) == controller:
             if elem["status"] == 1 or elem["status"] == "connect":
-                map.add_point((elem["latitude"], elem["longitude"]), 1)
+                map.add_point((elem["latitude"], elem["longitude"], elem["id"], elem["asn"], elem["country_code"]), 1)
             if elem["status"] == 2 or elem["status"] == "disconnect":
-                map.add_point((elem["latitude"], elem["longitude"]), 2)
+                map.add_point((elem["latitude"], elem["longitude"], elem["id"], elem["asn"], elem["country_code"]), 2)
 
     with open("output.html", "w") as out:
         print(map, file=out)
