@@ -163,12 +163,31 @@ class Map(object):
                     input:focus {{
                         width: 100%;
                     }}
+
+                    button.sort {{
+                        background-color: #e7e7e7;
+                        color: black;
+                        border: none;
+                        padding: 10px 16px;
+                        text-align: center;
+                        text-decoration: none;
+                        display: inline-block;
+                        font-size: 16px;
+                        margin: 4px 2px;
+                        cursor: pointer;
+                    }}
                 </style>
 
                 <button class="accordion">Connected Probes : {coprobes}</button>
                 <div id="panel1" class="panel1">
                     <br>
                     <input class="search" placeholder="Search" />
+                    <br>
+                    <br>
+                    <button class="sort" data-sort="id">Sort by ID</button>
+                    <button class="sort" data-sort="asn">Sort by ASN</button>
+                    <button class="sort" data-sort="cc">Sort by Country Code</button>
+                    <br>
                     <br>
                     <table>
                         <thead>
@@ -190,10 +209,16 @@ class Map(object):
                     var probeList = new List('panel1', options);
                 </script>
 
-                <button class="accordion">Disconnected Probes : {discoprobes}</button>
+                <button class="accordion">Connected Probes : {discoprobes}</button>
                 <div id="panel2" class="panel2">
                     <br>
                     <input class="search" placeholder="Search" />
+                    <br>
+                    <br>
+                    <button class="sort" data-sort="id">Sort by ID</button>
+                    <button class="sort" data-sort="asn">Sort by ASN</button>
+                    <button class="sort" data-sort="cc">Sort by Country Code</button>
+                    <br>
                     <br>
                     <table>
                         <thead>
