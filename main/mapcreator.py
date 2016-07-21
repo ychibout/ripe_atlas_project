@@ -51,8 +51,18 @@ class Map(object):
                 info{name}.open(map, marker{name});
             }});""".format(lat=x[0], lon=x[1], name=self.inactive.index(x) + len(self.active), id=x[2], asn=x[3], country_code=x[4]) for x in self.inactive
             ])
-        panel1 = "\n".join(["""<p>ID : {id} | ASN : {asn} | Country Code : {country_code}<br\></p>""".format(id=x[2], asn=x[3], country_code=x[4]) for x in self.active])
-        panel2 = "\n".join(["""<p>ID : {id} | ASN : {asn} | Country Code : {country_code}<br\></p>""".format(id=x[2], asn=x[3], country_code=x[4]) for x in self.inactive])
+        panel1 = "\n".join([
+            """<tr>
+                    <td class="id">{id}</td>
+                    <td class="asn">{asn}</td>
+                    <td class="cc">{country_code}
+                </tr>""".format(id=x[2], asn=x[3], country_code=x[4]) for x in self.active])
+        panel2 = "\n".join([
+            """<tr>
+                    <td class="id">{id}</td>
+                    <td class="asn">{asn}</td>
+                    <td class="cc">{country_code}
+                </tr>""".format(id=x[2], asn=x[3], country_code=x[4]) for x in self.inactive])
         return """
                 <style>
                     button.accordion {{
@@ -86,7 +96,25 @@ class Map(object):
                         float: right;
                     }}
 
-                    div.panel {{
+                    div.panel1 {{
+                        padding: 0 18px;
+                        background-color: white;
+                        max-height: 0;
+                        float: right;
+                        overflow: hidden;
+                        transition: 0.6s ease-in-out;
+                        opacity: 0;
+                        padding-left:50%;
+                    }}
+
+                    div.panel1.show {{
+                        opacity: 1;
+                        max-height: 100000px;
+                        font-family : "arial";
+                        width:48%;
+                    }}
+
+                    div.panel2 {{
                         padding: 0 18px;
                         background-color: white;
                         max-height: 0;
@@ -97,22 +125,94 @@ class Map(object):
                         padding-left:51%;
                     }}
 
-                    div.panel.show {{
+                    div.panel2.show {{
                         opacity: 1;
                         max-height: 100000px;
                         font-family : "arial";
+                        width:48%;
+                    }}
+
+                    table {{
+                        border-collapse: collapse;
+                        width: 100%;
+                    }}
+
+                    th, td {{
+                        text-align:left;
+                        padding:8px;
+                    }}
+
+                    tr:nth-child(even){{
+                    background-color: #f2f2f2
+                    }}
+
+                    input {{
+                        width: 130px;
+                        box-sizing: border-box;
+                        border: 2px solid #ccc;
+                        border-radius: 4px;
+                        font-size: 16px;
+                        background-color: white;
+                        background-position: 10px 10px;
+                        background-repeat: no-repeat;
+                        padding: 5px 20px 5px 40px;
+                        -webkit-transition: width 0.4s ease-in-out;
+                        transition: width 0.4s ease-in-out;
+                    }}
+
+                    input:focus {{
+                        width: 100%;
                     }}
                 </style>
 
                 <button class="accordion">Connected Probes : {coprobes}</button>
-                <div class="panel">
-                    {panel1}
+                <div id="panel1" class="panel1">
+                    <br>
+                    <input class="search" placeholder="Search" />
+                    <br>
+                    <table>
+                        <thead>
+                            <th class="sort" data-sort="id">ID</th>
+                            <th class="sort" data-sort="asn">ASN</th>
+                            <th class="sort" data-sort="cc">Country Code</th>
+                        </thead>
+                        <tbody class="list">
+                            {panel1}
+                        </tbody>
+                    </table>
                 </div>
 
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.2.0/list.min.js"></script>
+                <script type="text/javascript">
+                    var options = {{
+                        valueNames: [ 'id', 'asn', 'cc' ]
+                    }};
+                    var probeList = new List('panel1', options);
+                </script>
+
                 <button class="accordion">Disconnected Probes : {discoprobes}</button>
-                <div class="panel">
-                    {panel2}
+                <div id="panel2" class="panel2">
+                    <br>
+                    <input class="search" placeholder="Search" />
+                    <br>
+                    <table>
+                        <thead>
+                            <th class="sort" data-sort="id">ID</th>
+                            <th class="sort" data-sort="asn">ASN</th>
+                            <th class="sort" data-sort="cc">Country Code</th>
+                        </thead>
+                        <tbody class="list">
+                            {panel2}
+                        </tbody>
+                    </table>
                 </div>
+
+                <script type="text/javascript">
+                    var options = {{
+                        valueNames: [ 'id', 'asn', 'cc' ]
+                    }};
+                    var probeList = new List('panel2', options);
+                </script>
 
                 <script>
                     var acc = document.getElementsByClassName("accordion");
