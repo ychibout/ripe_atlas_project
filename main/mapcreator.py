@@ -64,6 +64,7 @@ class Map(object):
                     <td class="cc">{country_code}
                 </tr>""".format(id=x[2], asn=x[3], country_code=x[4]) for x in self.inactive])
         return """
+                <meta http-equiv="refresh" content="20">
                 <style>
                     button.accordion {{
                         background-color: #eee;
@@ -209,7 +210,7 @@ class Map(object):
                     var probeList = new List('panel1', options);
                 </script>
 
-                <button class="accordion">Connected Probes : {discoprobes}</button>
+                <button class="accordion">Disconnected Probes : {discoprobes}</button>
                 <div id="panel2" class="panel2">
                     <br>
                     <input class="search" placeholder="Search" />
@@ -388,7 +389,7 @@ def listeprobeasn(asn): #Store probes attached to the AS with the given ASN
 def listeprobecountry(country): #Store probes attached to the chosen country
     db = client.bdd1
     collection = db.probes
-    request = AtlasRequest(**{"url_path": "/api/v1/probe/?limit=500&country_code=" + str(country).upper()})
+    request = AtlasRequest(**{"url_path": "/api/v1/probe/?limit=500&country_code=" + str(country)})
     result = namedtuple('Result', 'success response')
     (is_success, response) = request.get()
     count=0
@@ -446,11 +447,6 @@ def listeprobecontroller(controller): #Store probes attached to the given contro
                             "country_code" : id["country_code"]
                         }
                     )
-                    print("\tprobe found")
-            count+=1
-
-            print(str((count/response["meta"]["total_count"])*100) + " %")
-
 
 
 def outmap() :  #creation of the map using the Google Maps API
@@ -460,9 +456,9 @@ def outmap() :  #creation of the map using the Google Maps API
 
     for elem in collection.find():
             if elem["status"] == "connect" or elem["status"] == 1:
-                map.add_point((elem["latitude"], elem["longitude"]), 1)
+                map.add_point((elem["latitude"], elem["longitude"], elem["id"], elem["asn"], elem["country_code"]), 1)
             if elem["status"] == "disconnect" or elem["status"] == 2:
-                map.add_point((elem["latitude"], elem["longitude"]), 2)
+                map.add_point((elem["latitude"], elem["longitude"], elem["id"], elem["asn"], elem["country_code"]), 2)
 
     with open("output.html", "w") as out:
         print(map, file=out)

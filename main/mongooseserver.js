@@ -48,6 +48,7 @@ http.createServer(function(request, response) {
                                 probe.status = pstatus;
                                 probe.timestamp = ptimestamp;
                                 probe.controller = pcontroller;
+                                probe.asn = pasn;
                                 probe.save();
                                 console.log("id probe : " + pid);
                                 console.log("status : " + pstatus);
