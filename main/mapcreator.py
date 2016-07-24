@@ -348,9 +348,9 @@ def listeprobe() :  #Store all probes of the RIPE ATLAS Network with their actua
                     }
                 )
 
-                count+=1
+        count+=1
 
-                print(str((count/response["meta"]["total_count"])*100) + " %")
+        print(str((count/response["meta"]["total_count"])*100) + " %")
 
         i+=500
 
@@ -413,7 +413,7 @@ def listeprobecountry(country): #Store probes attached to the chosen country
                 }
             )
 
-            count+=1
+        count+=1
 
         print(str((count/response["meta"]["total_count"])*100) + " %")
 
@@ -447,6 +447,10 @@ def listeprobecontroller(controller): #Store probes attached to the given contro
                             "country_code" : id["country_code"]
                         }
                     )
+
+            count+=1
+
+            print(str((count/response["meta"]["total_count"])*100) + " %")
 
 
 def outmap() :  #creation of the map using the Google Maps API
