@@ -8,18 +8,30 @@ Requirements
 ----------
 
 This project uses some tools needed to be installed before.
- 
-The first one is RIPE ATLAS Cousteau, useful to communicate with the RIPE ATLAS API.
-With pip3 :
+
+This programm only works on Python3. If you havn't install it yet, you can download it at the official website : https://www.python.org/downloads/
+
+First of all, you have to clone this Github Repository or just download the ZIP file : 
 
 ```
-$ pip3 insall ripe.atlas.cousteau
+$ git clone https://github.com/ychibout/ripe_atlas_project.git
+```
+ 
+The first tool is RIPE ATLAS Cousteau, useful to communicate with the RIPE ATLAS API.
+
+Install of RIPE ATLAS Cousteau:
+
+```
+$ apt-get install python3-ripe-atlas-cousteau
 ```
 
 A node.js server is used to listen the stream of the RIPE ATLAS API.
 
+Install of node.js
+
 ```
 $ apt-get install nodejs
+$ apt-get install nodejs-legacy
 ```
 
 Finally, a MongoDB database, connected with the node.js server, will storage data sent from the stream API. We use the node.js API of MongoDB, named Mongoose, and the Python API, named PyMongo. 
@@ -30,29 +42,23 @@ Install of MongoDB:
 $ apt-get install mongodb
 ```
 
-Install of Mongoose:
+Before installing Mongoose, the package manager of Node.js need to be installed :
+
+```
+$ apt-get install npm
+```
+
+Then, to install of Mongoose and the few others packages, you have to be in the '/ripe_atlas_project/main' folder:
 
 ```
 $ npm install mongoose
+$ npm install xmlhttprequest
 ```
 
 Install of pymongo:
-With pip3 :
-
-```
-$ pip3 install pymongo
-```
-
-With apt-get:
 
 ```
 $ apt-get install python3-pymongo
-```
-
-Of course, to use the program, you have to clone this Github Repository or just download the ZIP file : 
-
-```
-$ git clone https://github.com/ychibout/ripe_atlas_project.git
 ```
 
 
@@ -115,6 +121,16 @@ $ python3 main/mapcreator.py > out
 
 Finally, the programm will create a map in the folder ./main (output.html) and places all markers related to probes in the database. This display could be filter by ASN, controller or country code. The freshing rate is 20 seconds (customizable).
 
+Before recalling program, make sure that the database is empty. If it is not, these commands will fix the situation :
+
+```
+$ mongo
+MongoDB shell version: 2.4.9
+connecting to: test
+> use bdd1
+switched to db bdd1
+> db.dropDatabase()
+```
 
 Additional details
 ----------
