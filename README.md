@@ -9,7 +9,7 @@ Requirements
 
 This project uses some tools needed to be installed before.
 
-This programm only works on Python3. If you havn't install it yet, you can download it at the official website : https://www.python.org/downloads/
+This program only works on Python3. If you havn't install it yet, you can download it at the official website : https://www.python.org/downloads/
 
 First of all, you have to clone this Github Repository or just download the ZIP file : 
 
@@ -94,13 +94,13 @@ Or a filter by country code with --country option, or by controller with --contr
 The usage is also explained by passing the option --help. 
 
 
-Then, you will able to choose for example which ASN use as filter of the map marker displayer. If nothing is typed, the programm will display on the output map all probes of the RIPE Atlas Network.
+Then, you will able to choose for example which ASN use as filter of the map marker displayer. If nothing is typed, the program will display on the output map all probes of the RIPE Atlas Network.
 
 
 Results
 ----------
 
-When the programm begins to run, a new terminal will appear and run the node.js server. That server will "listen" the stream API of RIPE ATLAS. Each information about a probe state changing received by the server will be displayed on his terminal screen. 
+When the program begins to run, a new terminal will appear and run the node.js server. That server will "listen" the stream API of RIPE ATLAS. Each information about a probe state changing received by the server will be displayed on his terminal screen. 
 
 At the same time, these informations are stored in a MongoDB Database. To check it, proceed like that :
 
@@ -113,13 +113,13 @@ switched to db bdd1
 > db.probes.find()
 ```
 
-Every 20 seconds (customizable), the python programm browse the database to check breakdowns first by countries, and in a second time, by probes owned by each controller. These results are displayed in the terminal screen, but can be saved in a file just by a redirection :
+Every 20 seconds (customizable), the python program browse the database to check breakdowns first by countries, and in a second time, by probes owned by each controller. These results are displayed in the terminal screen, but can be saved in a file just by a redirection :
 
 ```
 $ python3 main/mapcreator.py > out
 ```
 
-Finally, the programm will create a map in the folder ./main (output.html) and places all markers related to probes in the database. This display could be filter by ASN, controller or country code. The freshing rate is 20 seconds (customizable).
+Finally, the program will create a map in the folder ./main (output.html) and places all markers related to probes in the database. This display could be filter by ASN, controller or country code. The freshing rate is 20 seconds (customizable).
 
 Before recalling program, make sure that the database is empty. If it is not, these commands will fix the situation :
 
